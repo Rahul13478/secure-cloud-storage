@@ -1,0 +1,9 @@
+.env
+.env.*
+__pycache__
+*.pyc
+*.enc
+storage/
+file_download/
+backend/app/image/
+backend/app/image-storage/
