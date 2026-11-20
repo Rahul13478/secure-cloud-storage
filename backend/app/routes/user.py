@@ -86,7 +86,8 @@ async def user_login(user:UserLogin , request:Request, background:BackgroundTask
     get_user = db.query(User).filter_by(email = user.email).first()
     if get_user is None:
         test_rate_limit(ip_login_fail , 20 ,1800)
-        raise HTTPException(401 , "invalid credentials ")
+        raise HTTPException(401 , "invalid credentials")
+    
     user_id = get_user.id
     str_user_id =str(user_id)
     user_email = user.email
@@ -104,7 +105,7 @@ async def user_login(user:UserLogin , request:Request, background:BackgroundTask
     if cheack_password == False:
         test_rate_limit(key , 5 , 900)
         test_rate_limit(ip_login_fail , 20 , 1800)
-        raise HTTPException(401 , "invalid credentials ")
+        raise HTTPException(401 , "invalid credentials")
     
     if cheack_password == True:
         
