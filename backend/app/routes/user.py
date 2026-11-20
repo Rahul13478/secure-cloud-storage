@@ -74,16 +74,25 @@ def user_register(user:UserRegister, background : BackgroundTasks, db : Session 
 
 @router.post("/login")
 async def user_login(user:UserLogin , request:Request, background:BackgroundTasks, db : Session = Depends(get_db)):
+    clint_ip  = request.client.host
+    ip_login_fail = "login_ip_fail:"+clint_ip
+
+    ip_count = read_count(ip_login_fail , 20)
+    if ip_count is True:
+        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS)
+
+
 
     get_user = db.query(User).filter_by(email = user.email).first()
     if get_user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        test_rate_limit(ip_login_fail , 20 ,1800)
+        raise HTTPException(401 , "invalid credentials ")
     user_id = get_user.id
     str_user_id =str(user_id)
     user_email = user.email
     key = "Login_fail:"+user_email
     key_for_login = "login_ok:"+user_email
-
+  
   
     read = read_count(key , 5)
     if read is True:
@@ -93,8 +102,9 @@ async def user_login(user:UserLogin , request:Request, background:BackgroundTask
     cheack_password = verify_password(plain_password=user.password , hashed_password=get_user.password_hash)
 
     if cheack_password == False:
-        test_rate_limit(key , 5 , 120)
-        raise HTTPException(401 , "wrong password ")
+        test_rate_limit(key , 5 , 900)
+        test_rate_limit(ip_login_fail , 20 , 1800)
+        raise HTTPException(401 , "invalid credentials ")
     
     if cheack_password == True:
         
@@ -103,8 +113,9 @@ async def user_login(user:UserLogin , request:Request, background:BackgroundTask
         remake_dna = dna_make(token)
 
         if remake_dna != user.dna:
-            test_rate_limit(key , 5 ,120)
-            raise HTTPException(401 , "wrong DNA")   
+            test_rate_limit(key , 5 ,900)
+            test_rate_limit(ip_login_fail , 20 ,1800)
+            raise HTTPException(401 , "invalid credentials")   
         
         if remake_dna == user.dna:
             clear_count(key)
