@@ -1,7 +1,7 @@
 from passlib.context import CryptContext #used in password hashing 
 from app.core.settings import setting
 from jose import jwt , JWTError
-from datetime import datetime , timedelta
+from datetime import datetime , timedelta , timezone
 from fastapi import Depends , HTTPException  ,status
 from fastapi.security import HTTPAuthorizationCredentials , HTTPBearer
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -26,7 +26,7 @@ def verify_password(plain_password:str , hashed_password:str): #take plain pass 
 # creating tocken ---->
 
 def create_token(email:str , id:str):
-    now = datetime.now()
+    now = datetime.now(timezone.utc)
     expire = now+timedelta(minutes=30)
     payload = {
         "sub": id,
