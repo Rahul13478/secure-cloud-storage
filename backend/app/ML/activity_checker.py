@@ -1,6 +1,8 @@
 import joblib
+from pathlib import Path
 import pandas as pd 
-model = joblib.load(r"F:\cloud-storage\backend\final_ml_model.joblib")
+MODEL_PATH=Path(__file__).resolve().parents[2] / "final_ml_model.joblib"
+model = joblib.load(MODEL_PATH)
 
 def cheack_activity(download , upload , delet):
     # make a table using pandas -->
@@ -14,5 +16,3 @@ def cheack_activity(download , upload , delet):
 
     return result[0]
 
-ans = cheack_activity(1,1,1)
-print(ans)
